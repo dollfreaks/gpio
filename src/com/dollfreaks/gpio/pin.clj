@@ -1,4 +1,4 @@
-(ns com.dollfreaks.gpio)
+(ns com.dollfreaks.gpio.pin)
 
 (let [gpio-dir "/sys/class/gpio"
       export-file (str gpio-dir "/export")
