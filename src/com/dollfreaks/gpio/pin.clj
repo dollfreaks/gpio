@@ -5,10 +5,10 @@
       export-file (file gpio-dir "export")
       unexport-file (file gpio-dir "unexport")
       STATES {:high "1" :low "0"}
-      DIRECTIONS {:input "in" :output "out"}
+      DIRECTIONS {:input "in" :output "out" :high "high" :low "low"}
       INTERRUPTS {:none "none" :rising "rising" :falling "falling" :all "both"}
-      pin-dir (memoize (fn [p] (file (str gpio-dir "/gpio" p))))
-      pin-file (memoize (fn [p f] (file (pin-dir p) (str "/" f))))
+      pin-dir (memoize (fn [p] (file gpio-dir (str "gpio" p))))
+      pin-file (memoize (fn [p f] (file (pin-dir p) f)))
       pin-file-fn (fn [f] (fn [p] (pin-file p f)))
       value-file (pin-file-fn "value")
       direction-file (pin-file-fn "direction")
@@ -22,18 +22,18 @@
   (defn set-direction! [p dir]
     (let [f (direction-file p)]
       (if (.exists f)
-        (spit f (get (merge DIRECTIONS STATES dir)))
+        (spit f (get DIRECTIONS dir))
         (throw (Exception. (str "Cannot change direction for GPIO pin " p))))))
 
   (defn input! [p] (set-direction! p :input))
 
   (defn output!
     "Set the pin direction as output, optionally setting the default pin value"
-    ([p] (output! p :low))
+    ([p] (set-direction! p :output))
     ([p v] (set-direction! p v)))
 
   (defn direction [p]
-    (case (slurp (direction-file p))
+    (condp = (slurp (direction-file p))
       (:input DIRECTIONS) :input
       (:output DIRECTIONS) :output
       nil))
@@ -45,7 +45,7 @@
   (defn high! [p] (set-state! p :high))
   (defn low! [p] (set-state! p :low))
 
-  (defn state [p] (case (slurp (value-file p))
+  (defn state [p] (condp = (slurp (value-file p))
                     (:high STATES) :high
                     (:low STATES) :low
                     nil))
