@@ -1,5 +1,6 @@
 (ns com.dollfreaks.gpio.pin
-  (:require [clojure.java.io :refer (file)]))
+  (:require [clojure.java.io :refer (file)]
+            [clojure.string :refer (trim-newline)]))
 
 (let [gpio-dir "/sys/class/gpio"
       export-file (file gpio-dir "export")
@@ -33,7 +34,7 @@
     ([p v] (set-direction! p v)))
 
   (defn direction [p]
-    (condp = (slurp (direction-file p))
+    (condp = (trim-newline (slurp (direction-file p)))
       (:input DIRECTIONS) :input
       (:output DIRECTIONS) :output
       nil))
@@ -45,7 +46,7 @@
   (defn high! [p] (set-state! p :high))
   (defn low! [p] (set-state! p :low))
 
-  (defn state [p] (condp = (slurp (value-file p))
+  (defn state [p] (condp = (trim-newline (slurp (value-file p)))
                     (:high STATES) :high
                     (:low STATES) :low
                     nil))
