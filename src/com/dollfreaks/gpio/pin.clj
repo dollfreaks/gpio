@@ -54,12 +54,12 @@
   (defn high? [p] (= :high (state p)))
   (defn low? [p] (= :low (state p)))
 
-  (defn interrupt-on! [p e]
+  (defn set-interrupt-on! [p e]
     (let [f (edge-file p)]
       (if (.exists f)
         (spit f (get INTERRUPTS e))
         (throw (Exception. (str "Cannot configure interrupts for GPIO pin " p))))))
 
-  (defn active-on! [p v]
+  (defn set-active-on! [p v]
     "Should :low or :high be considered the 'rising' value and vice versa"
     (spit (active-low-file p) (case v :low 1 :high 0 0))))
