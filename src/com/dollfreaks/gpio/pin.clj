@@ -3,6 +3,9 @@
   (:require [com.dollfreaks.gpio.sysfs.pin :as sysfs]))
 
 (def gpio-pin sysfs/gpio-pin)
+(def export! sysfs/export!)
+(def unexport! sysfs/unexport!)
+(def exported? sysfs/exported?)
 
 (def STATES {:high 1 :low 0})
 (def DIRECTIONS {:input "in" :output "out" :high "high" :low "low"})

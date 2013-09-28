@@ -17,13 +17,13 @@
 (def edge-file (pin-file-fn "edge"))
 (def active-low-file (pin-file-fn "active_low"))
 
-(defrecord GPIOPinFiles [dir value direction edge active-low])
-(defrecord GPIOPin [p fs])
+(defrecord GPIOSysfsPinFiles [dir value direction edge active-low])
+(defrecord GPIOPin [^Integer pin ^GPIOSysfsPinFiles fs])
 
 (defn gpio-pin [p]
   (GPIOPin.
     p
-    (GPIOPinFiles.
+    (GPIOSysfsPinFiles.
       (pin-dir p)
       (value-file p)
       (direction-file p)
@@ -32,7 +32,7 @@
 
 (defn export! [^GPIOPin p] (spit export-file (:pin p)) p)
 (defn unexport! [^GPIOPin p] (spit unexport-file (:pin p)) p)
-(defn exported? [^GPIOPin p] (.exists (:dir (:pin p))))
+(defn exported? [^GPIOPin p] (.exists (:dir (:fs p))))
 
 (defn- valid-direction [d]
   (if (contains? #{"in" "out" "high" "low"} d)
@@ -49,7 +49,7 @@
   (trim-newline (slurp (:direction (:fs p)))))
 
 (defn- valid-state [s]
-  (if (contains? #{"high" "low"} s)
+  (if (contains? #{1 0} s)
     s
     (throw (Exception. (str "`" s "` is not a valid pin state")))))
 
