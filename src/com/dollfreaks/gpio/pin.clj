@@ -1,7 +1,10 @@
 (ns com.dollfreaks.gpio.pin
+  "clojure-esque api on top of the sysfs implementation"
   (:require [com.dollfreaks.gpio.sysfs.pin :as sysfs]))
 
-(def STATES {:high "1" :low "0"})
+(def gpio-pin sysfs/gpio-pin)
+
+(def STATES {:high 1 :low 0})
 (def DIRECTIONS {:input "in" :output "out" :high "high" :low "low"})
 (def INTERRUPTS {:none "none" :rising "rising" :falling "falling" :all "both"})
 
@@ -25,7 +28,7 @@
 (defn input? [p] (= :input (direction p)))
 (defn output? [p] (= :output (direction p)))
 
-(defn set-state! [p s] (sysfs/set-state! p (get STATES s)))
+(defn set-state! [p s] (sysfs/set-state! p (get STATES s)) p)
 (defn high! [p] (set-state! p :high))
 (defn low! [p] (set-state! p :low))
 
@@ -36,7 +39,7 @@
 (defn low? [p] (= :low (state p)))
 
 (defn interrupt-on! [p e]
-  (sysfs/interrupt-on! p (get INTERRUPTS e)))
+  (sysfs/interrupt-on! p (get INTERRUPTS e)) p)
 
 (defn active-on-low! [p] (sysfs/active-low! p true) p)
 (defn active-on-high! [p] (sysfs/active-low! p false) p)
